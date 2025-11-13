@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HLS Stream Capturer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎬 HLS Stream Capturer</h1>
+      <div class="toggle-container">
+        <label class="switch">
+          <input type="checkbox" id="captureToggle">
+          <span class="slider"></span>
+        </label>
+        <span id="statusText">캡처 중지</span>
+      </div>
+    </header>
+
+    <div class="stats">
+      <div class="stat-item">
+        <span class="stat-label">캡처된 스트림</span>
+        <span class="stat-value" id="streamCount">0</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="clearBtn" class="btn btn-secondary">
+        🗑️ 전체 삭제
+      </button>
+      <button id="refreshBtn" class="btn btn-primary">
+        🔄 새로고침
+      </button>
+    </div>
+
+    <div class="streams-container">
+      <div class="streams-header">
+        <h2>캡처된 스트림 목록</h2>
+        <div class="filter-container">
+          <select id="filterSelect" class="filter-select">
+            <option value="variant-m3u8">Variant M3U8만</option>
+            <option value="all">모두 보기</option>
+            <option value="master-m3u8">Master M3U8만</option>
+            <option value="cloudflare-workers">Cloudflare Workers만</option>
+          </select>
+          <label class="checkbox-container">
+            <input type="checkbox" id="hideDuplicates" checked>
+            <span class="checkmark"></span>
+            중복 숨기기
+          </label>
+        </div>
+      </div>
+      <div id="streamsList" class="streams-list">
+        <div class="empty-state">
+          <p>아직 캡처된 스트림이 없습니다.</p>
+          <p>위에서 캡처를 활성화하고 스트리밍 사이트를 방문하세요.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
