@@ -8,20 +8,20 @@ const streamsList = document.getElementById('streamsList');
 const filterSelect = document.getElementById('filterSelect');
 const hideDuplicates = document.getElementById('hideDuplicates');
 
-// 전역 변수
+// Global variables
 let allStreams = [];
 
-// 초기화
+// Initialization
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
   loadStreams();
   
-  // 필터 이벤트 리스너
+  // Filter event listeners
   filterSelect.addEventListener('change', applyFilters);
   hideDuplicates.addEventListener('change', applyFilters);
 });
 
-// 상태 로드
+// Load state
 function loadState() {
   chrome.storage.local.get(['isCapturing'], (result) => {
     const isCapturing = result.isCapturing || false;
@@ -30,7 +30,7 @@ function loadState() {
   });
 }
 
-// 캡처 토글
+// Capture toggle
 captureToggle.addEventListener('change', (e) => {
   const enabled = e.target.checked;
   
@@ -40,22 +40,22 @@ captureToggle.addEventListener('change', (e) => {
       if (response && response.success) {
         updateStatusText(enabled);
         if (enabled) {
-          showToast('✅ 캡처 시작됨');
+          showToast('✅ Capture started');
         } else {
-          showToast('⏸️ 캡처 중지됨');
+          showToast('⏸️ Capture stopped');
         }
       }
     }
   );
 });
 
-// 상태 텍스트 업데이트
+// Update status text
 function updateStatusText(isCapturing) {
-  statusText.textContent = isCapturing ? '캡처 중' : '캡처 중지';
+  statusText.textContent = isCapturing ? 'Capturing' : 'Capture stopped';
   statusText.className = isCapturing ? 'status-active' : 'status-inactive';
 }
 
-// 스트림 목록 로드
+// Load streams list
 function loadStreams() {
   chrome.runtime.sendMessage({ action: 'getStreams' }, (response) => {
     if (response && response.streams) {
@@ -65,23 +65,23 @@ function loadStreams() {
   });
 }
 
-// 필터 적용
+// Apply filters
 function applyFilters() {
   const filterType = filterSelect.value;
   const shouldHideDuplicates = hideDuplicates.checked;
   
   let filteredStreams = [...allStreams];
   
-  // 타입 필터링
+  // Type filtering
   if (filterType !== 'all') {
     filteredStreams = filteredStreams.filter(stream => stream.type === filterType);
   }
   
-  // 중복 제거
+  // Remove duplicates
   if (shouldHideDuplicates) {
     const uniqueUrls = new Set();
     filteredStreams = filteredStreams.filter(stream => {
-      const cleanUrl = stream.url.split('?')[0]; // 쿼리 파라미터 제거
+      const cleanUrl = stream.url.split('?')[0]; // Remove query parameters
       if (uniqueUrls.has(cleanUrl)) {
         return false;
       }
@@ -93,7 +93,7 @@ function applyFilters() {
   displayStreams(filteredStreams);
 }
 
-// 스트림 표시
+// Display streams
 function displayStreams(streams) {
   streamCount.textContent = streams.length;
 
@@ -101,19 +101,19 @@ function displayStreams(streams) {
     const filterType = filterSelect.value;
     const shouldHideDuplicates = hideDuplicates.checked;
     
-    let emptyMessage = '아직 캡처된 스트림이 없습니다.';
+    let emptyMessage = 'No captured streams yet.';
     if (allStreams.length > 0) {
       if (filterType !== 'all') {
-        emptyMessage = `${getTypeLabel(filterType)} 타입의 스트림이 없습니다.`;
+        emptyMessage = `No ${getTypeLabel(filterType)} type streams found.`;
       } else if (shouldHideDuplicates) {
-        emptyMessage = '중복을 제외한 스트림이 없습니다.';
+        emptyMessage = 'No streams found after removing duplicates.';
       }
     }
     
     streamsList.innerHTML = `
       <div class="empty-state">
         <p>${emptyMessage}</p>
-        <p>위에서 캡처를 활성화하고 스트리밍 사이트를 방문하세요.</p>
+        <p>Enable capture above and visit streaming sites.</p>
       </div>
     `;
     return;
@@ -129,73 +129,73 @@ function displayStreams(streams) {
       <div class="stream-url">${escapeHtml(stream.url)}</div>
       <div class="stream-actions">
         <button class="btn-small btn-copy" data-url="${escapeHtml(stream.url)}">
-          📋 복사
+          📋 Copy
         </button>
         <button class="btn-small btn-proxy" data-url="${escapeHtml(stream.url)}">
-          🔄 프록시
+          🔄 Proxy
         </button>
         <button class="btn-small btn-open" data-url="${escapeHtml(stream.url)}">
-          🔗 열기
+          🔗 Open
         </button>
       </div>
     </div>
   `).join('');
 
-  // 이벤트 리스너 추가
+  // Add event listeners
   attachStreamActions();
 }
 
-// 스트림 액션 이벤트 리스너
+// Stream action event listeners
 function attachStreamActions() {
-  // 복사 버튼
+  // Copy button
   document.querySelectorAll('.btn-copy').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const url = e.target.getAttribute('data-url');
       copyToClipboard(url);
-      showToast('📋 URL 복사됨');
+      showToast('📋 URL copied');
     });
   });
 
-  // 프록시 버튼
+  // Proxy button
   document.querySelectorAll('.btn-proxy').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       const url = e.target.getAttribute('data-url');
       const btn = e.target;
       
-      btn.textContent = '⏳ 처리 중...';
+      btn.textContent = '⏳ Processing...';
       btn.disabled = true;
 
       try {
-        // background.js를 통해 프록시 서버로 요청
+        // Send request to proxy server through background.js
         chrome.runtime.sendMessage(
           { action: 'sendToProxy', url: url },
           (response) => {
             if (response && response.success) {
-              // 프록시 URL 복사
+              // Copy proxy URL
               copyToClipboard(response.result.proxyUrl);
-              showToast('✅ 프록시 URL 생성 및 복사됨');
+              showToast('✅ Proxy URL generated and copied');
 
-              // 새 탭에서 열기
+              // Open in new tab
               window.open(`http://localhost:3500`, '_blank');
             } else {
-              console.error('프록시 오류:', response ? response.error : '알 수 없는 오류');
-              showToast('❌ 프록시 서버 연결 실패', 'error');
+              console.error('Proxy error:', response ? response.error : 'Unknown error');
+              showToast('❌ Failed to connect to proxy server', 'error');
             }
             
-            btn.textContent = '🔄 프록시';
+            btn.textContent = '🔄 Proxy';
             btn.disabled = false;
           }
         );
       } catch (error) {
-        console.error('프록시 오류:', error);
-        showToast('❌ 프록시 서버 연결 실패', 'error');
-        btn.textContent = '🔄 프록시';
+        console.error('Proxy error:', error);
+        showToast('❌ Failed to connect to proxy server', 'error');
+        btn.textContent = '🔄 Proxy';
         btn.disabled = false;
       }
     });
   });
 
-  // 열기 버튼
+  // Open button
   document.querySelectorAll('.btn-open').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const url = e.target.getAttribute('data-url');
@@ -204,7 +204,7 @@ function attachStreamActions() {
   });
 }
 
-// 타입 라벨
+// Type labels
 function getTypeLabel(type) {
   const labels = {
     'master-m3u8': 'Master M3U8',
@@ -218,38 +218,38 @@ function getTypeLabel(type) {
   return labels[type] || type;
 }
 
-// 시간 포맷
+// Time formatting
 function formatTime(timestamp) {
   const date = new Date(timestamp);
   const now = new Date();
   const diff = now - date;
 
   if (diff < 60000) {
-    return '방금 전';
+    return 'Just now';
   } else if (diff < 3600000) {
-    return `${Math.floor(diff / 60000)}분 전`;
+    return `${Math.floor(diff / 60000)} minutes ago`;
   } else if (diff < 86400000) {
-    return `${Math.floor(diff / 3600000)}시간 전`;
+    return `${Math.floor(diff / 3600000)} hours ago`;
   } else {
-    return date.toLocaleString('ko-KR');
+    return date.toLocaleString('en-US');
   }
 }
 
-// HTML 이스케이프
+// HTML escaping
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
-// 클립보드 복사
+// Copy to clipboard
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text).catch(err => {
-    console.error('복사 실패:', err);
+    console.error('Copy failed:', err);
   });
 }
 
-// 토스트 메시지
+// Toast messages
 function showToast(message, type = 'success') {
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
@@ -266,20 +266,20 @@ function showToast(message, type = 'success') {
   }, 3000);
 }
 
-// 전체 삭제
+// Clear all
 clearBtn.addEventListener('click', () => {
-  if (confirm('모든 캡처된 스트림을 삭제하시겠습니까?')) {
+  if (confirm('Are you sure you want to delete all captured streams?')) {
     chrome.runtime.sendMessage({ action: 'clearStreams' }, (response) => {
       if (response && response.success) {
         loadStreams();
-        showToast('🗑️ 전체 삭제됨');
+        showToast('🗑️ All cleared');
       }
     });
   }
 });
 
-// 새로고침
+// Refresh
 refreshBtn.addEventListener('click', () => {
   loadStreams();
-  showToast('🔄 새로고침됨');
+  showToast('🔄 Refreshed');
 });

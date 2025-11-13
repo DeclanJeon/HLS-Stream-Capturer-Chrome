@@ -1,16 +1,16 @@
-// 페이지에 주입되는 스크립트
-// 필요시 웹페이지의 비디오 플레이어를 직접 조작 가능
+// Script injected into page
+// Can directly manipulate video players on web pages if needed
 
-console.log('🎬 HLS Stream Capturer Content Script 로드됨');
+console.log('🎬 HLS Stream Capturer Content Script loaded');
 
-// 비디오 요소 감지
+// Detect video elements
 function detectVideoElements() {
   const videos = document.querySelectorAll('video');
   
   videos.forEach(video => {
-    console.log('📹 비디오 요소 발견:', video.src);
+    console.log('📹 Video element found:', video.src);
     
-    // video.src 모니터링
+      // Monitor video.src
     if (video.src) {
       chrome.runtime.sendMessage({
         action: 'videoDetected',
@@ -20,14 +20,14 @@ function detectVideoElements() {
   });
 }
 
-// DOM 로드 후 실행
+// Run after DOM loads
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', detectVideoElements);
 } else {
   detectVideoElements();
 }
 
-// MutationObserver로 동적 비디오 감지
+// Dynamic video detection with MutationObserver
 function initObserver() {
   if (!document.body) {
     setTimeout(initObserver, 100);
@@ -44,5 +44,5 @@ function initObserver() {
   });
 }
 
-// 옵저버 초기화
+// Initialize observer
 initObserver();

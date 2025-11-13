@@ -1,193 +1,193 @@
-# HLS Stream Capturer Chrome 확장 프로그램
+# HLS Stream Capturer Chrome Extension
 
-HLS 스트리밍 URL을 캡처하고 프록시 서버로 전송하는 Chrome 확장 프로그램입니다.
+A Chrome extension that captures HLS streaming URLs and sends them to a proxy server.
 
-## 기능
+## Features
 
-- 🎬 HLS/DASH 스트림 URL 자동 감지
-- 🔄 프록시 서버로 URL 전송
-- 📋 URL 클립보드 복사
-- 🔗 직접 URL 열기
-- 📊 캡처된 스트림 목록 관리
+- 🎬 Automatic detection of HLS/DASH stream URLs
+- 🔄 Send URLs to proxy server
+- 📋 Copy URLs to clipboard
+- 🔗 Open URLs directly
+- 📊 Manage captured stream list
 
-## 설치 방법
+## Installation
 
-### 1. 확장 프로그램 로드
+### 1. Load Extension
 
-1. Chrome 브라우저에서 `chrome://extensions/` 열기
-2. 우측 상단 "개발자 모드" 활성화
-3. "압축해제된 확장 프로그램을 로드합니다" 클릭
-4. 프로젝트 폴더(`hls-stream-capturer`) 선택
+1. Open `chrome://extensions/` in Chrome browser
+2. Enable "Developer mode" in the top right
+3. Click "Load unpacked extension"
+4. Select the project folder (`hls-stream-capturer`)
 
-### 2. 프록시 서버 준비 (필수)
+### 2. Prepare Proxy Server (Required)
 
-**중요:** 확장 프로그램을 사용하려면 반드시 프록시 서버가 실행 중이어야 합니다.
+**Important:** The proxy server must be running to use the extension.
 
-1. 프록시 서버 디렉토리로 이동:
+1. Navigate to the proxy server directory:
 ```bash
 cd /path/to/proxy-server
 ```
 
-2. 서버 시작:
+2. Start the server:
 ```bash
 npm start
 ```
 
-3. 서버가 정상적으로 실행되면 다음 메시지가 표시됩니다:
+3. When the server is running successfully, you should see:
 ```
-🚀 서버 실행: http://localhost:3500
+🚀 Server running: http://localhost:3500
 ```
 
-4. 브라우저에서 `http://localhost:3500` 접속하여 서버가 작동하는지 확인
+4. Visit `http://localhost:3500` in your browser to verify the server is working
 
-**문제 해결:**
-- 프록시 버튼이 실패하면 서버가 실행 중인지 확인
-- 포트 3500이 다른 프로그램에서 사용 중인지 확인
-- 방화벽이 localhost:3500 접속을 차단하지 않는지 확인
+**Troubleshooting:**
+- If the proxy button fails, check if the server is running
+- Check if port 3500 is being used by another program
+- Check if firewall is blocking localhost:3500 access
 
-## 사용 방법
+## Usage
 
-### 1. 캡처 활성화
+### 1. Enable Capture
 
-1. 확장 프로그램 아이콘 클릭
-2. "캡처 시작" 토글 활성화
+1. Click the extension icon
+2. Enable the "Start Capture" toggle
 
-### 2. 스트리밍 사이트 방문
+### 2. Visit Streaming Sites
 
-1. 스트리밍 사이트 방문 (예: YouTube, Netflix 등)
-2. 자동으로 M3U8 URL 캡처됨
+1. Visit streaming sites (e.g., YouTube, Netflix, etc.)
+2. M3U8 URLs will be automatically captured
 
-### 3. 캡처된 스트림 관리
+### 3. Manage Captured Streams
 
-1. 팝업에서 캡처된 스트림 목록 확인
-2. 각 스트림에 대해 다음 작업 가능:
-   - 📋 **복사**: URL을 클립보드에 복사
-   - 🔄 **프록시**: 프록시 서버로 URL 전송
-   - 🔗 **열기**: 새 탭에서 URL 열기
+1. View the captured stream list in the popup
+2. For each stream, you can:
+   - 📋 **Copy**: Copy URL to clipboard
+   - 🔄 **Proxy**: Send URL to proxy server
+   - 🔗 **Open**: Open URL in new tab
 
-## 파일 구조
+## File Structure
 
 ```
 hls-stream-capturer/
-├── manifest.json          # 확장 프로그램 설정
-├── background.js          # 백그라운드 스크립트 (네트워크 모니터링)
-├── popup.html            # 팝업 UI
-├── popup.js              # 팝업 로직
-├── content.js            # 웹페이지에 주입되는 스크립트
-├── styles.css            # 스타일
-├── icon-generator.js     # 아이콘 생성 스크립트
-├── package.json          # Node.js 패키지 설정
+├── manifest.json          # Extension configuration
+├── background.js          # Background script (network monitoring)
+├── popup.html            # Popup UI
+├── popup.js              # Popup logic
+├── content.js            # Script injected into web pages
+├── styles.css            # Styles
+├── icon-generator.js     # Icon generation script
+├── package.json          # Node.js package configuration
 └── icons/
     ├── icon16.png
     ├── icon48.png
     └── icon128.png
 ```
 
-## 지원하는 스트림 타입
+## Supported Stream Types
 
-- **Master M3U8**: 메인 플레이리스트 파일
-- **Variant M3U8**: 변형 플레이리스트 파일
-- **TS Segment**: MPEG-TS 세그먼트
-- **M4S Segment**: MPEG-4 세그먼트
-- **DASH Manifest**: DASH 매니페스트
-- **Cloudflare Workers**: CF Workers 스트림
+- **Master M3U8**: Main playlist file
+- **Variant M3U8**: Variant playlist file
+- **TS Segment**: MPEG-TS segment
+- **M4S Segment**: MPEG-4 segment
+- **DASH Manifest**: DASH manifest
+- **Cloudflare Workers**: CF Workers stream
 
-## 고급 기능
+## Advanced Features
 
-### 자동 프록시 전송
+### Automatic Proxy Sending
 
-Master M3U8 URL이 감지되면 자동으로 프록시 서버로 전송할 수 있습니다.
+Master M3U8 URLs can be automatically sent to the proxy server when detected.
 
-### 필터링 기능
+### Filtering Feature
 
-특정 타입의 스트림만 필터링하여 볼 수 있습니다.
+You can filter to view only specific types of streams.
 
-### 내보내기 기능
+### Export Feature
 
-캡처된 스트림 목록을 JSON 파일로 내보낼 수 있습니다.
+Captured stream list can be exported as a JSON file.
 
-## 문제 해결
+## Troubleshooting
 
-### 프록시 서버 연결 실패
+### Proxy Server Connection Failed
 
-**"❌ 프록시 서버 연결 실패" 메시지가 표시될 때:**
+**When you see "❌ Proxy server connection failed" message:**
 
-1. **서버 실행 확인:**
+1. **Check server running:**
    ```bash
-   # 프록시 서버 디렉토리에서 실행
+   # Run in proxy server directory
    npm start
    ```
-   다음 메시지가 표시되어야 합니다:
+   You should see:
    ```
-   🚀 서버 실행: http://localhost:3500
+   🚀 Server running: http://localhost:3500
    ```
 
-2. **포트 확인:**
+2. **Check port:**
    ```bash
-   # 포트 3500이 사용 중인지 확인
+   # Check if port 3500 is in use
    lsof -i :3500
-   # 또는
+   # or
    netstat -an | grep 3500
    ```
 
-3. **서버 접속 테스트:**
-   브라우저에서 `http://localhost:3500` 접속하여 서버가 응답하는지 확인
+3. **Test server access:**
+   Visit `http://localhost:3500` in your browser to check if the server responds
 
-4. **방화벽 확인:**
-   로컬 방화벽이 localhost:3500 접속을 차단하지 않는지 확인
+4. **Check firewall:**
+   Make sure local firewall is not blocking localhost:3500 access
 
-### 스트림이 캡처되지 않음
+### Streams Not Being Captured
 
-1. **캡처 토글 확인:**
-   - 확장 프로그램 팝업에서 "캡처 시작"이 활성화되어 있는지 확인
+1. **Check capture toggle:**
+   - Make sure "Start Capture" is enabled in the extension popup
 
-2. **페이지 새로고침:**
-   - 캡처를 활성화한 후 스트리밍 페이지를 새로고침
+2. **Refresh page:**
+   - Refresh the streaming page after enabling capture
 
-3. **개발자 도구 확인:**
-   - F12 키로 개발자 도구 열기
-   - Network 탭에서 .m3u8 파일 요청이 있는지 확인
+3. **Check developer tools:**
+   - Open developer tools with F12 key
+   - Check if there are .m3u8 file requests in the Network tab
 
-4. **지원 사이트 확인:**
-   - HLS 스트리밍을 사용하는 사이트인지 확인
-   - YouTube, Netflix, Vimeo 등 대부분의 스트리밍 사이트 지원
+4. **Check supported sites:**
+   - Verify if the site uses HLS streaming
+   - Most streaming sites like YouTube, Netflix, Vimeo are supported
 
-### 확장 프로그램 오류
+### Extension Errors
 
-1. **권한 확인:**
-   - chrome://extensions/에서 확장 프로그램 권한이 올바르게 설정되었는지 확인
+1. **Check permissions:**
+   - Verify extension permissions are correctly set in chrome://extensions/
 
-2. **다시 로드:**
-   - 확장 프로그램 페이지에서 "새로고침" 버튼 클릭
+2. **Reload:**
+   - Click the "Refresh" button on the extensions page
 
-3. **콘솔 오류 확인:**
-   - 팝업을 열고 F12 키로 개발자 도구 열기
-   - Console 탭에서 오류 메시지 확인
+3. **Check console errors:**
+   - Open the popup and open developer tools with F12 key
+   - Check for error messages in the Console tab
 
-### 일반적인 오류 해결
+### Common Error Solutions
 
-**"Uncaught TypeError: Failed to execute 'observe' on 'MutationObserver'" 오류:**
-- 이 오류는 일시적이며 확장 프로그램 기능에 영향을 주지 않습니다
-- 페이지를 새로고침하면 자동으로 해결됩니다
+**"Uncaught TypeError: Failed to execute 'observe' on 'MutationObserver'" error:**
+- This error is temporary and does not affect extension functionality
+- It resolves automatically when you refresh the page
 
-**"Failed to fetch" 오류:**
-- 프록시 서버가 실행 중인지 확인
-- http://localhost:3500 접속 테스트
-- 방화벽 설정 확인
+**"Failed to fetch" error:**
+- Check if the proxy server is running
+- Test http://localhost:3500 access
+- Check firewall settings
 
-## 개발자 정보
+## Developer Information
 
-이 확장 프로그램은 Chrome Manifest V3를 사용하여 개발되었습니다.
+This extension is developed using Chrome Manifest V3.
 
-### 권한
+### Permissions
 
-- `webRequest`: 네트워크 요청 모니터링
-- `storage`: 로컬 데이터 저장
-- `tabs`: 탭 정보 접근
-- `notifications`: 알림 표시
-- `clipboardWrite`: 클립보드 쓰기
-- `<all_urls>`: 모든 웹사이트 접근
+- `webRequest`: Monitor network requests
+- `storage`: Store local data
+- `tabs`: Access tab information
+- `notifications`: Show notifications
+- `clipboardWrite`: Write to clipboard
+- `<all_urls>`: Access all websites
 
-## 라이선스
+## License
 
 MIT License
